@@ -1,0 +1,58 @@
+<div class="hp-auth-wrapper">
+
+  <div class="hp-brand-panel">
+    <div class="hp-brand-logo">STB</div>
+    <h1>Votre espace<br>Prospect STB</h1>
+    <p>Connectez-vous pour accéder à votre tableau de bord et suivre vos démarches bancaires.</p>
+
+    <div class="hp-brand-features">
+      <div class="hp-feature-item">
+        <span class="hp-feature-dot"></span>
+        Connexion sécurisée
+      </div>
+      <div class="hp-feature-item">
+        <span class="hp-feature-dot"></span>
+        Vos informations centralisées
+      </div>
+    </div>
+  </div>
+
+  <div class="hp-form-panel">
+    <div class="hp-form-box">
+
+      <h2>Connexion</h2>
+      <p class="hp-form-subtitle">Accédez à votre espace prospect</p>
+
+      <div class="hp-error-msg" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="hp-field">
+        <label>Adresse email</label>
+        <input [(ngModel)]="user.email" placeholder="vous@exemple.com" type="email">
+      </div>
+
+      <div class="hp-field hp-password-wrapper">
+        <label>Mot de passe</label>
+        <input
+          [(ngModel)]="user.password"
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="••••••••">
+        <span class="hp-toggle-eye" (click)="showPassword = !showPassword">
+          {{ showPassword ? 'Masquer' : 'Afficher' }}
+        </span>
+      </div>
+
+      <button class="hp-btn-primary" (click)="login()" [disabled]="loading">
+        {{ loading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+
+      <p class="hp-form-footer">
+        Pas encore inscrit ?
+        <a routerLink="/signup">Créer un compte</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>

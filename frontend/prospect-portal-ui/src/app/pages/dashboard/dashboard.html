@@ -1,0 +1,89 @@
+<div class="hp-dash">
+
+  <div class="hp-dash-topbar">
+    <div class="hp-dash-brand">
+      <div class="hp-dash-logo">STB</div>
+      Portail Prospect
+    </div>
+
+    <div class="hp-dash-user" *ngIf="!loading">
+      <div class="hp-avatar">{{ initials }}</div>
+      <button class="hp-logout-btn" (click)="logout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="hp-dash-body">
+
+    <!-- Skeleton pendant chargement -->
+    <div *ngIf="loading">
+      <div class="hp-skeleton" style="width:100%; height:180px; margin-bottom:32px; border-radius:20px;"></div>
+      <div class="hp-skeleton" style="width:100%; height:120px; border-radius:16px;"></div>
+    </div>
+
+    <div *ngIf="!loading && user">
+
+      <div class="hp-welcome-banner">
+        <div class="hp-orb hp-orb-1"></div>
+        <h1>Bonjour {{ user.firstName }} 👋</h1>
+        <p>Voici un aperçu de votre espace prospect STB.</p>
+        <span class="hp-status-badge">
+          ● Statut : Prospect
+        </span>
+      </div>
+
+      <div class="hp-stats-grid">
+        <div class="hp-stat-card">
+          <div class="hp-stat-icon">📋</div>
+          <div class="hp-stat-value">Prospect</div>
+          <div class="hp-stat-label">Statut actuel</div>
+        </div>
+        <div class="hp-stat-card">
+          <div class="hp-stat-icon">🕒</div>
+          <div class="hp-stat-value">Aujourd'hui</div>
+          <div class="hp-stat-label">Date d'inscription</div>
+        </div>
+        <div class="hp-stat-card">
+          <div class="hp-stat-icon">✅</div>
+          <div class="hp-stat-value">Vérifié</div>
+          <div class="hp-stat-label">Compte sécurisé</div>
+        </div>
+      </div>
+
+      <div class="hp-section-title">Informations personnelles</div>
+      <div class="hp-info-card">
+        <div class="hp-info-row">
+          <span class="hp-info-label">Nom complet</span>
+          <span class="hp-info-value">{{ user.firstName }} {{ user.lastName }}</span>
+        </div>
+        <div class="hp-info-row">
+          <span class="hp-info-label">Adresse email</span>
+          <span class="hp-info-value">{{ user.email }}</span>
+        </div>
+        <div class="hp-info-row">
+          <span class="hp-info-label">Identifiant</span>
+          <span class="hp-info-value">#{{ user.id }}</span>
+        </div>
+      </div>
+
+      <div class="hp-section-title">Services bancaires</div>
+      <div class="hp-services-grid">
+        <div class="hp-service-card" *ngFor="let s of services">
+          <div class="hp-service-icon">{{ s.icon }}</div>
+          <h3>{{ s.name }}</h3>
+          <p>{{ s.desc }}</p>
+        </div>
+      </div>
+
+      <div class="hp-cta-card">
+        <div>
+          <h3>Devenez client STB</h3>
+          <p>Passez au statut client et profitez de l'ensemble de nos services bancaires.</p>
+        </div>
+        <button class="hp-cta-btn">Devenir client</button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

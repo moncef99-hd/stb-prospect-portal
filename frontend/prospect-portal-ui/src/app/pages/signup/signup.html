@@ -1,0 +1,78 @@
+<div class="hp-auth-wrapper">
+
+  <div class="hp-brand-panel">
+    
+  <div class="hp-orb hp-orb-1"></div>
+  <div class="hp-orb hp-orb-2"></div>
+  <div class="hp-orb hp-orb-3"></div>
+
+    <div class="hp-brand-logo">STB</div>
+    <h1>Bienvenue sur<br>le Portail Prospect</h1>
+    <p>Créez votre compte en quelques secondes et découvrez tous les services bancaires STB adaptés à vos besoins.</p>
+
+    <div class="hp-brand-features">
+      <div class="hp-feature-item">
+        <span class="hp-feature-dot"></span>
+        Ouverture de compte simplifiée
+      </div>
+      <div class="hp-feature-item">
+        <span class="hp-feature-dot"></span>
+        Suivi de votre dossier en temps réel
+      </div>
+      <div class="hp-feature-item">
+        <span class="hp-feature-dot"></span>
+        Accès sécurisé 24/7
+      </div>
+    </div>
+  </div>
+
+  <div class="hp-form-panel">
+    <div class="hp-form-box">
+
+      <h2>Créer votre compte</h2>
+      <p class="hp-form-subtitle">Rejoignez le portail prospect STB</p>
+
+      <div class="hp-error-msg" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="hp-field-row">
+        <div class="hp-field">
+          <label>Prénom</label>
+          <input [(ngModel)]="user.firstName" placeholder="Hiba">
+        </div>
+        <div class="hp-field">
+          <label>Nom</label>
+          <input [(ngModel)]="user.lastName" placeholder="Kaabi">
+        </div>
+      </div>
+
+      <div class="hp-field">
+        <label>Adresse email</label>
+        <input [(ngModel)]="user.email" placeholder="vous@exemple.com" type="email">
+      </div>
+
+      <div class="hp-field hp-password-wrapper">
+        <label>Mot de passe</label>
+        <input
+          [(ngModel)]="user.password"
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="••••••••">
+        <span class="hp-toggle-eye" (click)="showPassword = !showPassword">
+          {{ showPassword ? 'Masquer' : 'Afficher' }}
+        </span>
+      </div>
+
+      <button class="hp-btn-primary" (click)="register()" [disabled]="loading">
+        {{ loading ? 'Création en cours...' : 'Créer mon compte' }}
+      </button>
+
+      <p class="hp-form-footer">
+        Vous avez déjà un compte ?
+        <a routerLink="/login">Se connecter</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
