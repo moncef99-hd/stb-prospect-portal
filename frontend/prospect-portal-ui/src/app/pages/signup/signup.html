@@ -1,10 +1,9 @@
 <div class="hp-auth-wrapper">
 
   <div class="hp-brand-panel">
-    
-  <div class="hp-orb hp-orb-1"></div>
-  <div class="hp-orb hp-orb-2"></div>
-  <div class="hp-orb hp-orb-3"></div>
+    <div class="hp-orb hp-orb-1"></div>
+    <div class="hp-orb hp-orb-2"></div>
+    <div class="hp-orb hp-orb-3"></div>
 
     <div class="hp-brand-logo">STB</div>
     <h1>Bienvenue sur<br>le Portail Prospect</h1>
@@ -24,6 +23,19 @@
         Accès sécurisé 24/7
       </div>
     </div>
+
+    <div class="hp-trust-row">
+      <div class="hp-trust-card">
+        <span class="hp-trust-icon">🔒</span>
+        <div class="hp-trust-title">Chiffrement SSL</div>
+        <div class="hp-trust-desc">Données protégées de bout en bout</div>
+      </div>
+      <div class="hp-trust-card">
+        <span class="hp-trust-icon">🏛️</span>
+        <div class="hp-trust-title">Banque agréée</div>
+        <div class="hp-trust-desc">Régulée par la BCT</div>
+      </div>
+    </div>
   </div>
 
   <div class="hp-form-panel">
@@ -33,34 +45,48 @@
       <p class="hp-form-subtitle">Rejoignez le portail prospect STB</p>
 
       <div class="hp-error-msg" *ngIf="errorMessage">
-        {{ errorMessage }}
+        ⚠️ {{ errorMessage }}
       </div>
 
       <div class="hp-field-row">
-        <div class="hp-field">
+        <div class="hp-field hp-field-icon">
           <label>Prénom</label>
-          <input [(ngModel)]="user.firstName" placeholder="Hiba">
+          <span class="hp-input-icon">👤</span>
+          <input [(ngModel)]="user.firstName" placeholder="Hiba" (keyup.enter)="register()">
         </div>
         <div class="hp-field">
           <label>Nom</label>
-          <input [(ngModel)]="user.lastName" placeholder="Kaabi">
+          <input [(ngModel)]="user.lastName" placeholder="Kaabi" (keyup.enter)="register()">
         </div>
       </div>
 
-      <div class="hp-field">
+      <div class="hp-field hp-field-icon">
         <label>Adresse email</label>
-        <input [(ngModel)]="user.email" placeholder="vous@exemple.com" type="email">
+        <span class="hp-input-icon">✉️</span>
+        <input [(ngModel)]="user.email" placeholder="vous@exemple.com" type="email" (keyup.enter)="register()">
       </div>
 
-      <div class="hp-field hp-password-wrapper">
+      <div class="hp-field hp-password-wrapper hp-field-icon">
         <label>Mot de passe</label>
+        <span class="hp-input-icon">🔑</span>
         <input
           [(ngModel)]="user.password"
+          (ngModelChange)="checkStrength()"
           [type]="showPassword ? 'text' : 'password'"
-          placeholder="••••••••">
+          placeholder="••••••••"
+          (keyup.enter)="register()">
         <span class="hp-toggle-eye" (click)="showPassword = !showPassword">
           {{ showPassword ? 'Masquer' : 'Afficher' }}
         </span>
+
+        <div class="hp-strength-bar" *ngIf="user.password">
+          <div class="hp-strength-seg" [class.active-weak]="strength >= 1"></div>
+          <div class="hp-strength-seg" [class.active-mid]="strength >= 2"></div>
+          <div class="hp-strength-seg" [class.active-strong]="strength >= 3"></div>
+        </div>
+        <div class="hp-strength-label" *ngIf="user.password">
+          Force du mot de passe : {{ strengthLabel }}
+        </div>
       </div>
 
       <button class="hp-btn-primary" (click)="register()" [disabled]="loading">
@@ -72,6 +98,14 @@
         <a routerLink="/login">Se connecter</a>
       </p>
 
+    </div>
+  </div>
+
+  <div class="hp-success-overlay" *ngIf="showSuccess">
+    <div class="hp-success-box">
+      <div class="hp-success-icon">✓</div>
+      <h3>Compte créé avec succès</h3>
+      <p>Redirection vers la connexion...</p>
     </div>
   </div>
 

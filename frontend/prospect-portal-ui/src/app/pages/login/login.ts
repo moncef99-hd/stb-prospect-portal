@@ -22,24 +22,63 @@ export class Login {
   loading = false;
   errorMessage = "";
 
+  private emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
   constructor(
     private auth: Auth,
     private router: Router
   ) {}
 
+  private validate(): string | null {
+    if (!this.user.email.trim()) {
+      return "L'adresse email est obligatoire.";
+    }
+
+    if (!this.emailRegex.test(this.user.email.trim())) {
+      return "Format d'email invalide. Exemple : nom@domaine.com";
+    }
+
+    if (!this.user.password) {
+      return "Le mot de passe est obligatoire.";
+    }
+
+    return null;
+  }
+
   login() {
     this.errorMessage = "";
+
+    const validationError = this.validate();
+    if (validationError) {
+      this.errorMessage = validationError;
+      return;
+    }
+
     this.loading = true;
 
-    this.auth.login(this.user).subscribe({
+    const payload = {
+      email: this.user.email.trim().toLowerCase(),
+      password: this.user.password
+    };
+
+    this.auth.login(payload).subscribe({
       next: (response: any) => {
         this.loading = false;
         this.auth.saveToken(response.token);
         this.router.navigate(['/dashboard']);
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.errorMessage = "Email ou mot de passe incorrect.";
+
+        if (err.status === 401) {
+          this.errorMessage = "Email ou mot de passe incorrect.";
+        } else if (err.status === 404) {
+          this.errorMessage = "Aucun compte trouvé avec cet email.";
+        } else if (err.status === 0) {
+          this.errorMessage = "Impossible de contacter le serveur. Vérifiez votre connexion.";
+        } else {
+          this.errorMessage = "Une erreur est survenue, veuillez réessayer.";
+        }
       }
     });
   }

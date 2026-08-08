@@ -14,6 +14,8 @@ export class Dashboard implements OnInit {
 
   loading = true;
   user: any = null;
+  daysSinceSignup = 0;
+  memberSince = '';
 
   services = [
     { icon: '💳', name: 'Carte bancaire', desc: 'Demandez votre carte Visa ou Mastercard STB.' },
@@ -34,12 +36,24 @@ export class Dashboard implements OnInit {
       next: (data: any) => {
         this.user = data;
         this.loading = false;
+
+        if (data.createdAt) {
+          const created = new Date(data.createdAt);
+          const now = new Date();
+          const diffMs = now.getTime() - created.getTime();
+          this.daysSinceSignup = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+
+          this.memberSince = created.toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
+        }
       },
-      error: (err) => {
-  console.error('Erreur /me :', err);
-  this.loading = false;
-  this.router.navigate(['/login']);
-}
+      error: () => {
+        this.loading = false;
+        this.router.navigate(['/login']);
+      }
     });
   }
 
