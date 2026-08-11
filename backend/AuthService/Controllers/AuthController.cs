@@ -66,7 +66,8 @@ public class AuthController : ControllerBase
         user.Id,
         user.FirstName,
         user.LastName,
-        user.Email
+        user.Email,
+        user.CreatedAt
     }
 });
     }
@@ -128,7 +129,8 @@ public async Task<IActionResult> Me()
         user.Id,
         user.FirstName,
         user.LastName,
-        user.Email
+        user.Email,
+        user.CreatedAt
     });
 }
 }

@@ -1,6 +1,10 @@
 <div class="hp-auth-wrapper">
 
   <div class="hp-brand-panel">
+    <div class="hp-orb hp-orb-1"></div>
+    <div class="hp-orb hp-orb-2"></div>
+    <div class="hp-orb hp-orb-3"></div>
+
     <div class="hp-brand-logo">STB</div>
     <h1>Votre espace<br>Prospect STB</h1>
     <p>Connectez-vous pour accéder à votre tableau de bord et suivre vos démarches bancaires.</p>
@@ -15,6 +19,19 @@
         Vos informations centralisées
       </div>
     </div>
+
+    <div class="hp-trust-row">
+      <div class="hp-trust-card">
+        <span class="hp-trust-icon">🔒</span>
+        <div class="hp-trust-title">Connexion chiffrée</div>
+        <div class="hp-trust-desc">Protocole JWT sécurisé</div>
+      </div>
+      <div class="hp-trust-card">
+        <span class="hp-trust-icon">⚡</span>
+        <div class="hp-trust-title">Accès instantané</div>
+        <div class="hp-trust-desc">Votre espace en un clic</div>
+      </div>
+    </div>
   </div>
 
   <div class="hp-form-panel">
@@ -24,20 +41,23 @@
       <p class="hp-form-subtitle">Accédez à votre espace prospect</p>
 
       <div class="hp-error-msg" *ngIf="errorMessage">
-        {{ errorMessage }}
+        ⚠️ {{ errorMessage }}
       </div>
 
-      <div class="hp-field">
+      <div class="hp-field hp-field-icon">
         <label>Adresse email</label>
-        <input [(ngModel)]="user.email" placeholder="vous@exemple.com" type="email">
+        <span class="hp-input-icon">✉️</span>
+        <input [(ngModel)]="user.email" placeholder="vous@exemple.com" type="email" (keyup.enter)="login()">
       </div>
 
-      <div class="hp-field hp-password-wrapper">
+      <div class="hp-field hp-password-wrapper hp-field-icon">
         <label>Mot de passe</label>
+        <span class="hp-input-icon">🔑</span>
         <input
           [(ngModel)]="user.password"
           [type]="showPassword ? 'text' : 'password'"
-          placeholder="••••••••">
+          placeholder="••••••••"
+          (keyup.enter)="login()">
         <span class="hp-toggle-eye" (click)="showPassword = !showPassword">
           {{ showPassword ? 'Masquer' : 'Afficher' }}
         </span>

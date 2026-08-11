@@ -45,6 +45,17 @@ body{
   100% { background-position: 300px 0; }
 }
 
+@keyframes hp-check-pop{
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes hp-count-fade{
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ================= AUTH LAYOUT ================= */
 .hp-auth-wrapper{
   display: flex;
@@ -113,6 +124,7 @@ body{
   margin-bottom: 18px;
   z-index: 1;
   animation: hp-fade-up 0.7s ease 0.1s both;
+  position: relative;
 }
 
 .hp-brand-panel p{
@@ -122,6 +134,7 @@ body{
   line-height: 1.7;
   z-index: 1;
   animation: hp-fade-up 0.7s ease 0.2s both;
+  position: relative;
 }
 
 .hp-brand-features{
@@ -131,6 +144,7 @@ body{
   gap: 18px;
   z-index: 1;
   animation: hp-fade-up 0.7s ease 0.3s both;
+  position: relative;
 }
 
 .hp-feature-item{
@@ -291,6 +305,138 @@ body{
   .hp-brand-panel{ display: none; }
 }
 
+/* ================= TRUST BADGES ================= */
+.hp-trust-row{
+  display: flex;
+  gap: 12px;
+  margin-top: 36px;
+  z-index: 1;
+  position: relative;
+}
+
+.hp-trust-card{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 14px 16px;
+  flex: 1;
+  backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+}
+
+.hp-trust-card:hover{
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-3px);
+}
+
+.hp-trust-icon{
+  font-size: 18px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.hp-trust-title{
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 2px;
+}
+
+.hp-trust-desc{
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.4;
+}
+
+/* ================= FORM ICON INPUTS ================= */
+.hp-field-icon{
+  position: relative;
+}
+
+.hp-field-icon input{
+  padding-left: 42px;
+}
+
+.hp-input-icon{
+  position: absolute;
+  left: 14px;
+  top: 38px;
+  font-size: 15px;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ================= PASSWORD STRENGTH ================= */
+.hp-strength-bar{
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.hp-strength-seg{
+  height: 3px;
+  flex: 1;
+  border-radius: 2px;
+  background: #e2e8f0;
+  transition: background 0.3s ease;
+}
+
+.hp-strength-seg.active-weak{ background: #e53e3e; }
+.hp-strength-seg.active-mid{ background: #dd9c1f; }
+.hp-strength-seg.active-strong{ background: #2f855a; }
+
+.hp-strength-label{
+  font-size: 11px;
+  color: #9aa5b3;
+  margin-top: 5px;
+}
+
+/* ================= SUCCESS OVERLAY ================= */
+.hp-success-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(10,37,64,0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: hp-fade-up 0.25s ease both;
+}
+
+.hp-success-box{
+  background: white;
+  border-radius: 20px;
+  padding: 40px 50px;
+  text-align: center;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+}
+
+.hp-success-icon{
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, #2f855a, #38a169);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 30px;
+  margin: 0 auto 18px;
+  animation: hp-check-pop 0.5s cubic-bezier(.2,1.4,.5,1) both;
+}
+
+.hp-success-box h3{
+  font-size: 18px;
+  font-weight: 700;
+  color: #0a2540;
+  margin-bottom: 6px;
+}
+
+.hp-success-box p{
+  font-size: 13.5px;
+  color: #7a8699;
+}
+
 /* ================= DASHBOARD LAYOUT ================= */
 .hp-dash{
   min-height: 100vh;
@@ -366,14 +512,13 @@ body{
 .hp-welcome-banner{
   background: linear-gradient(135deg, #0a2540, #145a8c);
   background-size: 200% 200%;
-  animation: hp-gradient-shift 10s ease infinite;
+  animation: hp-fade-up 0.6s ease both, hp-gradient-shift 10s ease infinite;
   border-radius: 20px;
   padding: 40px;
   color: white;
   position: relative;
   overflow: hidden;
   margin-bottom: 32px;
-  animation: hp-fade-up 0.6s ease both, hp-gradient-shift 10s ease infinite;
 }
 
 .hp-welcome-banner .hp-orb-1{ width: 220px; height: 220px; top: -60px; right: -40px; }
@@ -445,6 +590,7 @@ body{
   font-weight: 700;
   color: #0a2540;
   margin-bottom: 4px;
+  animation: hp-count-fade 0.5s ease both;
 }
 
 .hp-stat-label{
@@ -586,7 +732,319 @@ body{
   height: 16px;
 }
 
+/* ================= BANK CARD VISUAL ================= */
+.hp-card-section{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
 @media (max-width: 750px){
+  .hp-card-section{ grid-template-columns: 1fr; }
   .hp-stats-grid{ grid-template-columns: 1fr; }
   .hp-cta-card{ flex-direction: column; align-items: flex-start; }
+}
+
+.hp-bank-card{
+  background: linear-gradient(135deg, #0a2540 0%, #145a8c 60%, #1e7bb8 100%);
+  background-size: 200% 200%;
+  animation: hp-fade-up 0.6s ease both, hp-gradient-shift 8s ease infinite;
+  border-radius: 20px;
+  padding: 28px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 20px 40px rgba(10,37,64,0.28);
+}
+
+.hp-bank-card::before{
+  content: "";
+  position: absolute;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(201,162,39,0.18), transparent 70%);
+  top: -80px; right: -60px;
+  border-radius: 50%;
+}
+
+.hp-card-top{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 1;
+  position: relative;
+}
+
+.hp-card-chip{
+  width: 42px; height: 32px;
+  background: linear-gradient(135deg, #e6c65c, #c9a227);
+  border-radius: 7px;
+  position: relative;
+}
+
+.hp-card-chip::before{
+  content:"";
+  position:absolute;
+  inset: 5px;
+  border: 1px solid rgba(10,37,64,0.35);
+  border-radius: 4px;
+}
+
+.hp-card-brand{
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+.hp-card-number{
+  font-size: 20px;
+  letter-spacing: 3px;
+  font-weight: 600;
+  z-index: 1;
+  margin: 18px 0;
+  position: relative;
+}
+
+.hp-card-bottom{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  z-index: 1;
+  position: relative;
+}
+
+.hp-card-holder-label{
+  font-size: 10px;
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.hp-card-holder-name{
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.hp-card-status-pill{
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ================= TIMELINE ================= */
+.hp-timeline-card{
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(10,37,64,0.06);
+  animation: hp-fade-up 0.6s ease 0.1s both;
+}
+
+.hp-timeline-card h3{
+  font-size: 15px;
+  font-weight: 700;
+  color: #0a2540;
+  margin-bottom: 22px;
+}
+
+.hp-timeline{
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.hp-timeline-item{
+  display: flex;
+  gap: 16px;
+  position: relative;
+  padding-bottom: 26px;
+}
+
+.hp-timeline-item:last-child{ padding-bottom: 0; }
+
+.hp-timeline-item::before{
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 26px;
+  bottom: 0;
+  width: 2px;
+  background: #e6ebf1;
+}
+
+.hp-timeline-item:last-child::before{ display: none; }
+
+.hp-timeline-dot{
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.hp-timeline-dot.done{
+  background: #145a8c;
+  color: white;
+}
+
+.hp-timeline-dot.current{
+  background: #c9a227;
+  color: #0a2540;
+  animation: hp-pulse-dot 2s infinite;
+}
+
+.hp-timeline-dot.pending{
+  background: #eef1f5;
+  color: #a0aab8;
+  border: 2px solid #e2e8f0;
+}
+
+.hp-timeline-text h4{
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1c2b39;
+  margin-bottom: 2px;
+}
+
+.hp-timeline-text p{
+  font-size: 12px;
+  color: #9aa5b3;
+}
+/* ================= LOCKED CARD (prospect) ================= */
+.hp-bank-card-locked{
+  filter: saturate(0.7);
+}
+
+.hp-card-number-blur{
+  filter: blur(3px);
+  opacity: 0.5;
+}
+
+.hp-card-lock-overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(10,37,64,0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 20px;
+}
+
+.hp-card-lock-icon{
+  font-size: 28px;
+}
+
+.hp-card-lock-overlay p{
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  max-width: 200px;
+}
+
+/* ================= SERVICES GRID — BIGGER ================= */
+.hp-services-grid-big{
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+.hp-services-grid-big .hp-service-card{
+  padding: 32px 28px;
+  position: relative;
+}
+
+.hp-services-grid-big .hp-service-icon{
+  width: 56px; height: 56px;
+  font-size: 26px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.hp-services-grid-big .hp-service-card h3{
+  font-size: 16.5px;
+  margin-bottom: 8px;
+}
+
+.hp-services-grid-big .hp-service-card p{
+  font-size: 13px;
+}
+
+.hp-service-arrow{
+  position: absolute;
+  top: 28px;
+  right: 24px;
+  font-size: 16px;
+  color: #c9d3de;
+  transition: all 0.25s ease;
+}
+
+.hp-service-card:hover .hp-service-arrow{
+  color: #145a8c;
+  transform: translateX(4px);
+}
+
+/* ================= CTA — BIGGER, MORE PROMINENT ================= */
+.hp-cta-card-big{
+  padding: 46px 50px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hp-cta-card-big::before{
+  content: "";
+  position: absolute;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 70%);
+  top: -100px; right: -60px;
+  border-radius: 50%;
+}
+
+.hp-cta-content{
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+}
+
+.hp-cta-badge{
+  display: inline-block;
+  background: rgba(10,37,64,0.12);
+  color: #0a2540;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  letter-spacing: 0.3px;
+}
+
+.hp-cta-card-big h3{
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.hp-cta-card-big p{
+  font-size: 14.5px;
+  margin-bottom: 24px;
+  max-width: 100%;
+}
+
+.hp-cta-card-big .hp-cta-btn{
+  padding: 15px 32px;
+  font-size: 15px;
 }
