@@ -27,6 +27,20 @@ services:
     networks:
       - stb-network
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: stb-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - stb-network
+
   authservice:
     build: ./backend/AuthService
     container_name: stb-authservice
@@ -65,6 +79,7 @@ services:
 volumes:
   postgres_data:
   postgres_prospect_data:
+  rabbitmq_data:
 
 networks:
   stb-network:
