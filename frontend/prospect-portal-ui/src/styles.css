@@ -1048,3 +1048,298 @@ body{
   padding: 15px 32px;
   font-size: 15px;
 }
+/* ================= ADMIN TABLE ================= */
+.hp-admin-table-card{
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(10,37,64,0.06);
+  overflow: hidden;
+}
+
+.hp-admin-table-header,
+.hp-admin-table-row{
+  display: grid;
+  grid-template-columns: 60px 80px 1fr 1fr 130px 100px 200px;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 20px;
+  font-size: 13px;
+}
+
+.hp-admin-table-header{
+  background: #f5f7fa;
+  font-weight: 700;
+  color: #4a5568;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.hp-admin-table-row{
+  border-bottom: 1px solid #f0f3f8;
+  color: #1c2b39;
+}
+
+.hp-admin-table-row:last-child{ border-bottom: none; }
+
+.hp-admin-table-row:hover{
+  background: #fafbfc;
+}
+
+.hp-status-badge-sm{
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hp-badge-prospect{
+  background: #e6ebf1;
+  color: #4a5568;
+}
+
+.hp-badge-pending{
+  background: rgba(201,162,39,0.15);
+  color: #a17d17;
+}
+
+.hp-badge-client{
+  background: rgba(47,133,90,0.15);
+  color: #2f855a;
+}
+
+.hp-admin-actions{
+  display: flex;
+  gap: 8px;
+}
+
+.hp-btn-sm{
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.hp-btn-edit{
+  background: rgba(20,90,140,0.1);
+  color: #145a8c;
+}
+.hp-btn-edit:hover{ background: rgba(20,90,140,0.18); }
+
+.hp-btn-delete{
+  background: rgba(197,48,48,0.1);
+  color: #c53030;
+}
+.hp-btn-delete:hover{ background: rgba(197,48,48,0.18); }
+
+.hp-btn-save{
+  background: rgba(47,133,90,0.12);
+  color: #2f855a;
+}
+.hp-btn-save:hover{ background: rgba(47,133,90,0.2); }
+
+.hp-btn-cancel{
+  background: #eef1f5;
+  color: #7a8699;
+}
+.hp-btn-cancel:hover{ background: #e2e8f0; }
+
+.hp-admin-input{
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.hp-admin-empty{
+  padding: 40px;
+  text-align: center;
+  color: #9aa5b3;
+  font-size: 14px;
+}
+/* ================= ADMIN CREATE FORM ================= */
+.hp-admin-header-row{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.hp-btn-inline{
+  width: auto;
+  margin-top: 0;
+  padding: 10px 20px;
+  font-size: 13.5px;
+}
+
+.hp-create-card{
+  background: white;
+  border-radius: 16px;
+  padding: 26px;
+  box-shadow: 0 4px 20px rgba(10,37,64,0.06);
+  margin-bottom: 24px;
+  animation: hp-fade-up 0.3s ease both;
+}
+
+.hp-create-card h3{
+  font-size: 15px;
+  font-weight: 700;
+  color: #0a2540;
+  margin-bottom: 18px;
+}
+
+.hp-create-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.hp-success-msg{
+  background: #f0fdf4;
+  color: #2f855a;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 18px;
+  border: 1px solid #c6f6d5;
+  animation: hp-fade-up 0.3s ease both;
+}
+
+@media (max-width: 800px){
+  .hp-create-grid{ grid-template-columns: 1fr; }
+  .hp-admin-table-header,
+  .hp-admin-table-row{ grid-template-columns: 1fr; gap: 4px; }
+}
+/* ================= ADMIN — SEARCH & USER CELL ================= */
+.hp-admin-search{
+  padding: 10px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-family: 'Poppins', sans-serif;
+  width: 280px;
+  transition: all 0.2s ease;
+}
+
+.hp-admin-search:focus{
+  outline: none;
+  border-color: #145a8c;
+  box-shadow: 0 0 0 3px rgba(20,90,140,0.1);
+}
+
+.hp-admin-user-cell{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hp-admin-avatar{
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #145a8c, #1e7bb8);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.hp-admin-user-name{
+  display: block;
+  font-weight: 600;
+  color: #1c2b39;
+  font-size: 13px;
+}
+
+.hp-admin-user-email{
+  display: block;
+  font-size: 11.5px;
+  color: #9aa5b3;
+}
+
+.hp-admin-table-header,
+.hp-admin-table-row{
+  grid-template-columns: 1.6fr 1fr 1fr 130px 100px 200px;
+}
+/* ================= DELETE CONFIRMATION MODAL ================= */
+.hp-modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(10,37,64,0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: hp-fade-up 0.2s ease both;
+}
+
+.hp-modal-box{
+  background: white;
+  border-radius: 18px;
+  padding: 32px;
+  max-width: 380px;
+  text-align: center;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+}
+
+.hp-modal-icon{
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.hp-modal-box h3{
+  font-size: 17px;
+  font-weight: 700;
+  color: #0a2540;
+  margin-bottom: 10px;
+}
+
+.hp-modal-box p{
+  font-size: 13.5px;
+  color: #7a8699;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.hp-modal-actions{
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.hp-modal-actions .hp-btn-sm{
+  padding: 10px 20px;
+  font-size: 13px;
+}
+
+.hp-btn-confirm-delete{
+  background: #c53030;
+  color: white;
+}
+.hp-btn-confirm-delete:hover{ background: #9b2c2c; }
+/* ================= PROFILE EDIT (dashboard prospect) ================= */
+.hp-incomplete-banner{
+  background: rgba(201,162,39,0.1);
+  border: 1px solid rgba(201,162,39,0.3);
+  color: #8a6d14;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.hp-profile-edit-block{
+  padding-top: 8px;
+}

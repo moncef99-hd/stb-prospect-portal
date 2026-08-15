@@ -5,7 +5,9 @@
       <div class="hp-dash-logo">STB</div>
       Portail Prospect
     </div>
-
+<a routerLink="/admin/prospects" class="hp-logout-btn" *ngIf="isAdmin" style="margin-right:8px; text-decoration:none;">
+  ⚙️ Administration
+</a>
     <div class="hp-dash-user" *ngIf="!loading">
       <div class="hp-avatar">{{ initials }}</div>
       <button class="hp-logout-btn" (click)="logout()">Déconnexion</button>
@@ -14,7 +16,6 @@
 
   <div class="hp-dash-body">
 
-    <!-- Skeleton pendant chargement -->
     <div *ngIf="loading">
       <div class="hp-skeleton" style="width:100%; height:170px; margin-bottom:24px; border-radius:20px;"></div>
       <div class="hp-skeleton" style="width:100%; height:100px; margin-bottom:24px; border-radius:16px;"></div>
@@ -23,21 +24,21 @@
 
     <div *ngIf="!loading && user">
 
-      <!-- Bannière de bienvenue -->
+      <!-- Bannière -->
       <div class="hp-welcome-banner">
         <div class="hp-orb hp-orb-1"></div>
         <h1>Bonjour {{ user.firstName }} 👋</h1>
         <p>Voici un aperçu de votre espace prospect STB.</p>
         <span class="hp-status-badge">
-          ● Statut : Prospect
+          ● Statut : {{ statusLabel }}
         </span>
       </div>
 
-      <!-- Statistiques -->
+      <!-- Stats -->
       <div class="hp-stats-grid">
         <div class="hp-stat-card">
           <div class="hp-stat-icon">📋</div>
-          <div class="hp-stat-value">Prospect</div>
+          <div class="hp-stat-value">{{ statusLabel }}</div>
           <div class="hp-stat-label">Statut actuel</div>
         </div>
         <div class="hp-stat-card">
@@ -52,74 +53,97 @@
         </div>
       </div>
 
-     <!-- Carte bancaire (aperçu verrouillé) + Timeline -->
-<div class="hp-card-section">
+      <!-- Carte + Timeline -->
+      <div class="hp-card-section">
 
-  <div class="hp-bank-card hp-bank-card-locked">
-    <div class="hp-card-top">
-      <div class="hp-card-chip"></div>
-      <div class="hp-card-brand">STB PREMIUM</div>
-    </div>
+        <div class="hp-bank-card" [class.hp-bank-card-locked]="!isClient">
+          <div class="hp-card-top">
+            <div class="hp-card-chip"></div>
+            <div class="hp-card-brand">STB {{ isClient ? 'CLIENT' : 'PREMIUM' }}</div>
+          </div>
 
-    <div class="hp-card-number hp-card-number-blur">•••• •••• •••• ••••</div>
+          <div class="hp-card-number" [class.hp-card-number-blur]="!isClient">•••• •••• •••• ••••</div>
 
-    <div class="hp-card-bottom">
-      <div>
-        <div class="hp-card-holder-label">Titulaire</div>
-        <div class="hp-card-holder-name">{{ user.firstName }} {{ user.lastName }}</div>
-      </div>
-      <div class="hp-card-status-pill">🔒 Réservée aux clients</div>
-    </div>
+          <div class="hp-card-bottom">
+            <div>
+              <div class="hp-card-holder-label">Titulaire</div>
+              <div class="hp-card-holder-name">{{ user.firstName }} {{ user.lastName }}</div>
+            </div>
+            <div class="hp-card-status-pill">
+              {{ isClient ? 'Active' : (isPending ? 'En cours d\'activation' : 'Réservée aux clients') }}
+            </div>
+          </div>
 
-    <div class="hp-card-lock-overlay">
-      <div class="hp-card-lock-icon">🔒</div>
-      <p>Devenez client pour débloquer votre carte</p>
-    </div>
-  </div>
-
-  <div class="hp-timeline-card">
-    <h3>Votre parcours</h3>
-
-    <div class="hp-timeline">
-      <div class="hp-timeline-item">
-        <div class="hp-timeline-dot done">✓</div>
-        <div class="hp-timeline-text">
-          <h4>Inscription complétée</h4>
-          <p>Compte créé le {{ memberSince }}</p>
+          <div class="hp-card-lock-overlay" *ngIf="!isClient">
+            <div class="hp-card-lock-icon">🔒</div>
+            <p *ngIf="!isPending">Devenez client pour débloquer votre carte</p>
+            <p *ngIf="isPending">Votre demande est en cours de traitement</p>
+          </div>
         </div>
-      </div>
 
-      <div class="hp-timeline-item">
-        <div class="hp-timeline-dot current">●</div>
-        <div class="hp-timeline-text">
-          <h4>Statut Prospect</h4>
-          <p>Explorez nos services bancaires</p>
+        <div class="hp-timeline-card">
+          <h3>Votre parcours</h3>
+
+          <div class="hp-timeline">
+            <div class="hp-timeline-item">
+              <div class="hp-timeline-dot done">✓</div>
+              <div class="hp-timeline-text">
+                <h4>Inscription complétée</h4>
+                <p>Compte créé le {{ memberSince }}</p>
+              </div>
+            </div>
+
+            <div class="hp-timeline-item">
+              <div class="hp-timeline-dot" [class.done]="prospect?.status >= 1" [class.current]="prospect?.status === 0">
+                {{ prospect?.status >= 1 ? '✓' : '●' }}
+              </div>
+              <div class="hp-timeline-text">
+                <h4>Statut Prospect</h4>
+                <p>Explorez nos services bancaires</p>
+              </div>
+            </div>
+
+            <div class="hp-timeline-item">
+              <div class="hp-timeline-dot"
+                   [class.done]="isClient"
+                   [class.current]="isPending"
+                   [class.pending]="prospect?.status === 0">
+                {{ isClient ? '✓' : (isPending ? '●' : '3') }}
+              </div>
+              <div class="hp-timeline-text">
+                <h4>Devenir client</h4>
+                <p>{{ isPending ? 'Demande en cours de traitement' : 'Demande à soumettre' }}</p>
+              </div>
+            </div>
+
+            <div class="hp-timeline-item">
+              <div class="hp-timeline-dot" [class.done]="isClient" [class.pending]="!isClient">
+                {{ isClient ? '✓' : '4' }}
+              </div>
+              <div class="hp-timeline-text">
+                <h4>Compte bancaire actif</h4>
+                <p>Accès complet aux services STB</p>
+              </div>
+            </div>
+          </div>
         </div>
+
       </div>
 
-      <div class="hp-timeline-item">
-        <div class="hp-timeline-dot pending">3</div>
-        <div class="hp-timeline-text">
-          <h4>Devenir client</h4>
-          <p>Demande à soumettre</p>
-        </div>
-      </div>
-
-      <div class="hp-timeline-item">
-        <div class="hp-timeline-dot pending">4</div>
-        <div class="hp-timeline-text">
-          <h4>Carte bancaire active</h4>
-          <p>Accès complet aux services STB</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
+      <!-- Infos personnelles -->
+      <div class="hp-admin-header-row">
+  <div class="hp-section-title" style="margin:0;">Informations personnelles</div>
+  <button class="hp-btn-sm hp-btn-edit" *ngIf="!editingProfile" (click)="startEditProfile()">
+    ✏️ Modifier mes coordonnées
+  </button>
 </div>
 
-      <!-- Informations personnelles -->
-      <div class="hp-section-title">Informations personnelles</div>
+<div class="hp-success-msg" *ngIf="profileSuccess">
+  ✓ {{ profileSuccess }}
+</div>
+
 <div class="hp-info-card">
+
   <div class="hp-info-row">
     <span class="hp-info-label">Nom complet</span>
     <span class="hp-info-value">{{ user.firstName }} {{ user.lastName }}</span>
@@ -132,26 +156,88 @@
     <span class="hp-info-label">Membre depuis</span>
     <span class="hp-info-value">{{ memberSince }}</span>
   </div>
+
+  <ng-container *ngIf="!editingProfile">
+    <div class="hp-info-row">
+      <span class="hp-info-label">Téléphone</span>
+      <span class="hp-info-value">{{ prospect?.phoneNumber || 'Non renseigné' }}</span>
+    </div>
+    <div class="hp-info-row">
+      <span class="hp-info-label">Adresse</span>
+      <span class="hp-info-value">{{ prospect?.address || 'Non renseignée' }}</span>
+    </div>
+  </ng-container>
+
+  <div class="hp-profile-edit-block" *ngIf="editingProfile">
+
+    <div class="hp-error-msg" *ngIf="profileError">
+      ⚠️ {{ profileError }}
+    </div>
+
+    <div class="hp-field-row" style="margin-top:16px;">
+      <div class="hp-field">
+        <label>Téléphone</label>
+        <input [(ngModel)]="profileForm.phoneNumber" placeholder="12345678">
+      </div>
+      <div class="hp-field">
+        <label>Adresse</label>
+        <input [(ngModel)]="profileForm.address" placeholder="Ville, rue...">
+      </div>
+    </div>
+
+    <div class="hp-modal-actions" style="justify-content:flex-start; margin-top:8px;">
+      <button class="hp-btn-sm hp-btn-save" (click)="saveProfile()">Enregistrer</button>
+      <button class="hp-btn-sm hp-btn-cancel" (click)="cancelEditProfile()">Annuler</button>
+    </div>
+
+  </div>
+
 </div>
 
-      <!-- Services bancaires -->
-    <div class="hp-section-title">Services bancaires</div>
-<div class="hp-services-grid hp-services-grid-big">
-  <div class="hp-service-card" *ngFor="let s of services">
-    <div class="hp-service-icon">{{ s.icon }}</div>
-    <h3>{{ s.name }}</h3>
-    <p>{{ s.desc }}</p>
-    <div class="hp-service-arrow">→</div>
-  </div>
+      <!-- Services -->
+      <div class="hp-section-title">Services bancaires</div>
+      <div class="hp-services-grid hp-services-grid-big">
+        <div class="hp-service-card" *ngFor="let s of services">
+          <div class="hp-service-icon">{{ s.icon }}</div>
+          <h3>{{ s.name }}</h3>
+          <p>{{ s.desc }}</p>
+          <div class="hp-service-arrow">→</div>
+        </div>
+      </div>
+<div class="hp-incomplete-banner" *ngIf="!hasCompleteProfile && !isClient">
+  📋 Complétez votre profil (téléphone, adresse) pour accélérer le traitement de votre future demande.
 </div>
+      <!-- CTA devenir client -->
+      <div class="hp-cta-card hp-cta-card-big" *ngIf="!isClient">
+        <div class="hp-cta-content">
+          <div class="hp-cta-badge">✨ Prochaine étape</div>
+          <h3>Devenez client STB</h3>
+          <p>Débloquez votre carte bancaire, ouvrez un compte courant et profitez de l'ensemble de nos services financiers.</p>
 
-<div class="hp-cta-card hp-cta-card-big">
-  <div class="hp-cta-content">
-    <div class="hp-cta-badge">✨ Prochaine étape</div>
-    <h3>Devenez client STB</h3>
-    <p>Débloquez votre carte bancaire, ouvrez un compte courant et profitez de l'ensemble de nos services financiers.</p>
-    <button class="hp-cta-btn">Devenir client →</button>
+          <div class="hp-error-msg" *ngIf="becomeClientError">
+            ⚠️ {{ becomeClientError }}
+          </div>
+
+          <button
+            class="hp-cta-btn"
+            (click)="becomeClient()"
+            [disabled]="!canBecomeClient || becomingClient">
+            {{ isPending ? 'Demande en cours...' : (becomingClient ? 'Envoi...' : 'Devenir client →') }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Message si déjà client -->
+      <div class="hp-cta-card hp-cta-card-big" *ngIf="isClient">
+        <div class="hp-cta-content">
+          <div class="hp-cta-badge">🎉 Félicitations</div>
+          <h3>Vous êtes client STB</h3>
+          <p>Vous avez désormais accès à l'ensemble de nos services bancaires.</p>
+        </div>
+      </div>
+
+    </div>
+
   </div>
-</div>
 
 </div>
