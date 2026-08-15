@@ -1,0 +1,117 @@
+<div class="hp-dash">
+
+  <div class="hp-dash-topbar">
+    <div class="hp-dash-brand">
+      <div class="hp-dash-logo">STB</div>
+      Administration — Prospects
+    </div>
+  </div>
+
+  <div class="hp-dash-body">
+
+    <div class="hp-admin-header-row">
+      <div class="hp-section-title" style="margin:0;">Liste des prospects</div>
+      <button class="hp-btn-primary hp-btn-inline" (click)="toggleCreateForm()">
+        {{ showCreateForm ? '✕ Fermer' : '+ Ajouter un prospect' }}
+      </button>
+    </div>
+
+    <div class="hp-success-msg" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+
+    <div class="hp-error-msg" *ngIf="errorMessage">
+      ⚠️ {{ errorMessage }}
+    </div>
+
+    <!-- Formulaire de création -->
+    <div class="hp-create-card" *ngIf="showCreateForm">
+      <h3>Nouveau prospect</h3>
+
+      <div class="hp-error-msg" *ngIf="createError">
+        ⚠️ {{ createError }}
+      </div>
+
+      <div class="hp-create-grid">
+        <div class="hp-field">
+          <label>User ID (lié à AuthService)</label>
+          <input type="number" [(ngModel)]="createForm.userId" placeholder="ex: 3">
+        </div>
+        <div class="hp-field">
+          <label>Téléphone</label>
+          <input [(ngModel)]="createForm.phoneNumber" placeholder="12345678">
+        </div>
+        <div class="hp-field">
+          <label>Adresse</label>
+          <input [(ngModel)]="createForm.address" placeholder="Tunis">
+        </div>
+      </div>
+
+      <button class="hp-btn-primary hp-btn-inline" (click)="submitCreate()" [disabled]="creating">
+        {{ creating ? 'Création...' : 'Créer le prospect' }}
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="hp-skeleton" style="width:100%; height:300px; border-radius:16px;"></div>
+
+    <div class="hp-admin-table-card" *ngIf="!loading">
+
+      <div class="hp-admin-table-header">
+        <span>ID</span>
+        <span>User ID</span>
+        <span>Téléphone</span>
+        <span>Adresse</span>
+        <span>Statut</span>
+        <span>Créé le</span>
+        <span>Actions</span>
+      </div>
+
+      <div class="hp-admin-table-row" *ngFor="let p of prospects">
+
+        <ng-container *ngIf="editingId !== p.id">
+          <span>#{{ p.id }}</span>
+          <span>{{ p.userId }}</span>
+          <span>{{ p.phoneNumber || '—' }}</span>
+          <span>{{ p.address || '—' }}</span>
+          <span>
+            <span class="hp-status-badge-sm" [ngClass]="statusClass(p.status)">
+              {{ statusLabel(p.status) }}
+            </span>
+          </span>
+          <span>{{ p.createdAt | date:'dd/MM/yyyy' }}</span>
+          <span class="hp-admin-actions">
+            <button class="hp-btn-sm hp-btn-edit" (click)="startEdit(p)">Modifier</button>
+            <button class="hp-btn-sm hp-btn-delete" (click)="deleteProspect(p.id)">Supprimer</button>
+          </span>
+        </ng-container>
+
+        <ng-container *ngIf="editingId === p.id">
+          <span>#{{ p.id }}</span>
+          <span>{{ p.userId }}</span>
+          <span><input [(ngModel)]="editForm.phoneNumber" class="hp-admin-input"></span>
+          <span><input [(ngModel)]="editForm.address" class="hp-admin-input"></span>
+          <span>
+            <select [(ngModel)]="editForm.status" class="hp-admin-input">
+              <option [value]="0">Prospect</option>
+              <option [value]="1">En attente</option>
+              <option [value]="2">Client</option>
+            </select>
+          </span>
+          <span>{{ p.createdAt | date:'dd/MM/yyyy' }}</span>
+          <span class="hp-admin-actions">
+            <button class="hp-btn-sm hp-btn-save" (click)="saveEdit(p.id)">Enregistrer</button>
+            <button class="hp-btn-sm hp-btn-cancel" (click)="cancelEdit()">Annuler</button>
+          </span>
+        </ng-container>
+
+      </div>
+
+      <div class="hp-admin-empty" *ngIf="prospects.length === 0">
+        Aucun prospect enregistré pour le moment.
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

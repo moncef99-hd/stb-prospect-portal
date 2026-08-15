@@ -10,6 +10,10 @@ export class Prospect {
 
   constructor(private http: HttpClient) {}
 
+  getAll() {
+    return this.http.get(this.api);
+  }
+
   getByUserId(userId: number) {
     return this.http.get(`${this.api}/by-user/${userId}`);
   }
@@ -20,6 +24,10 @@ export class Prospect {
 
   update(id: number, data: any) {
     return this.http.put(`${this.api}/${id}`, data);
+  }
+
+  delete(id: number) {
+    return this.http.delete(`${this.api}/${id}`);
   }
 
   becomeClient(id: number) {
