@@ -13,14 +13,17 @@ public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly JwtService _jwtService;
+    private readonly RabbitMqPublisher _rabbitMqPublisher;
 
     public AuthController(
-    ApplicationDbContext context,
-    JwtService jwtService)
-{
-    _context = context;
-    _jwtService = jwtService;
-}
+        ApplicationDbContext context,
+        JwtService jwtService,
+        RabbitMqPublisher rabbitMqPublisher)
+    {
+        _context = context;
+        _jwtService = jwtService;
+        _rabbitMqPublisher = rabbitMqPublisher;
+    }
 
 
     [HttpPost("register")]
@@ -56,6 +59,24 @@ public class AuthController : ControllerBase
         // Sauvegarde PostgreSQL
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
+
+        // Publier l'événement UserRegistered vers RabbitMQ
+        try
+        {
+            await _rabbitMqPublisher.PublishUserRegisteredAsync(new
+            {
+                UserId = user.Id,
+                user.FirstName,
+                user.LastName,
+                user.Email,
+                user.CreatedAt
+            });
+        }
+        catch (Exception ex)
+        {
+            // L'inscription ne doit jamais échouer à cause de RabbitMQ
+            Console.WriteLine($"Failed to publish UserRegistered event: {ex.Message}");
+        }
 
 
        return Ok(new

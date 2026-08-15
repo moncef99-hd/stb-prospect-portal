@@ -38,6 +38,12 @@ services:
       - RABBITMQ_DEFAULT_PASS=guest
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 10s
+      retries: 15
+      start_period: 20s
     networks:
       - stb-network
 
@@ -48,8 +54,14 @@ services:
       - "8080:8080"
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=stb_auth;Username=postgres;Password=postgres123
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=guest
+      - RabbitMQ__Password=guest
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - stb-network
 
@@ -60,8 +72,14 @@ services:
       - "8081:8080"
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres-prospect;Port=5432;Database=stb_prospect;Username=postgres;Password=postgres123
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=guest
+      - RabbitMQ__Password=guest
     depends_on:
-      - postgres-prospect
+      postgres-prospect:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - stb-network
 
