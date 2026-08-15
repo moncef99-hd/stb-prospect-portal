@@ -29,7 +29,6 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
-        // Vérifier si email existe
         var existingUser = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
@@ -42,11 +41,9 @@ public class AuthController : ControllerBase
         }
 
 
-        // Hash du mot de passe
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
 
-        // Création User
         var user = new User
         {
             FirstName = dto.FirstName,
@@ -56,11 +53,9 @@ public class AuthController : ControllerBase
         };
 
 
-        // Sauvegarde PostgreSQL
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        // Publier l'événement UserRegistered vers RabbitMQ
         try
         {
             await _rabbitMqPublisher.PublishUserRegisteredAsync(new
@@ -74,7 +69,6 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            // L'inscription ne doit jamais échouer à cause de RabbitMQ
             Console.WriteLine($"Failed to publish UserRegistered event: {ex.Message}");
         }
 
@@ -151,7 +145,25 @@ public async Task<IActionResult> Me()
         user.FirstName,
         user.LastName,
         user.Email,
-        user.CreatedAt
+        user.CreatedAt,
+        user.Role
+    });
+}
+[Authorize]
+[HttpGet("users/{id}")]
+public async Task<IActionResult> GetUserById(int id)
+{
+    var user = await _context.Users.FindAsync(id);
+
+    if (user == null)
+        return NotFound(new { message = "Utilisateur introuvable." });
+
+    return Ok(new
+    {
+        user.Id,
+        user.FirstName,
+        user.LastName,
+        user.Email
     });
 }
 }

@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink, Router } from '@angular/router';
 import { Prospect } from '../../services/prospect';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-admin-prospects',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admin-prospects.html',
   styleUrl: './admin-prospects.css'
 })
@@ -16,6 +18,7 @@ export class AdminProspects implements OnInit {
   loading = true;
   errorMessage = '';
   successMessage = '';
+  searchTerm = '';
 
   editingId: number | null = null;
   editForm = {
@@ -24,16 +27,13 @@ export class AdminProspects implements OnInit {
     status: 0
   };
 
-  showCreateForm = false;
-  creating = false;
-  createForm = {
-    userId: null as number | null,
-    phoneNumber: '',
-    address: ''
-  };
-  createError = '';
+  deleteTarget: any = null;
 
-  constructor(private prospectService: Prospect) {}
+  constructor(
+    private prospectService: Prospect,
+    private auth: Auth,
+    private router: Router
+  ) {}
 
   ngOnInit(){
     this.loadProspects();
@@ -42,15 +42,51 @@ export class AdminProspects implements OnInit {
   loadProspects(){
     this.loading = true;
     this.prospectService.getAll().subscribe({
-      next: (data: any) => {
-        this.prospects = data;
+      next: (data: any[]) => {
+        this.prospects = data.map(p => ({ ...p, userName: '...', userEmail: '' }));
         this.loading = false;
+        this.enrichWithUserData();
       },
       error: () => {
         this.errorMessage = "Impossible de charger les prospects.";
         this.loading = false;
       }
     });
+  }
+
+  private enrichWithUserData(){
+    this.prospects.forEach(p => {
+      this.auth.getUserById(p.userId).subscribe({
+        next: (user: any) => {
+          p.userName = `${user.firstName} ${user.lastName}`;
+          p.userEmail = user.email;
+        },
+        error: () => {
+          p.userName = 'Utilisateur introuvable';
+          p.userEmail = '—';
+        }
+      });
+    });
+  }
+
+  get filteredProspects(){
+    if (!this.searchTerm.trim()) return this.prospects;
+
+    const term = this.searchTerm.toLowerCase();
+    return this.prospects.filter(p =>
+      p.userName?.toLowerCase().includes(term) ||
+      p.userEmail?.toLowerCase().includes(term) ||
+      p.phoneNumber?.toLowerCase().includes(term) ||
+      p.address?.toLowerCase().includes(term)
+    );
+  }
+
+  get countByStatus(){
+    return {
+      prospect: this.prospects.filter(p => p.status === 0).length,
+      pending: this.prospects.filter(p => p.status === 1).length,
+      client: this.prospects.filter(p => p.status === 2).length
+    };
   }
 
   statusLabel(status: number): string {
@@ -71,40 +107,11 @@ export class AdminProspects implements OnInit {
     }
   }
 
-  // ---------- CREATE ----------
-
-  toggleCreateForm(){
-    this.showCreateForm = !this.showCreateForm;
-    this.createError = '';
-    this.createForm = { userId: null, phoneNumber: '', address: '' };
+  initials(name: string): string {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    return (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
   }
-
-  submitCreate(){
-    this.createError = '';
-
-    if (!this.createForm.userId) {
-      this.createError = "Le User ID est obligatoire.";
-      return;
-    }
-
-    this.creating = true;
-
-    this.prospectService.create(this.createForm).subscribe({
-      next: () => {
-        this.creating = false;
-        this.showCreateForm = false;
-        this.successMessage = "Prospect créé avec succès.";
-        this.loadProspects();
-        setTimeout(() => this.successMessage = '', 3000);
-      },
-      error: (err) => {
-        this.creating = false;
-        this.createError = err?.error?.message || "Erreur lors de la création (User ID peut-être déjà utilisé).";
-      }
-    });
-  }
-
-  // ---------- UPDATE ----------
 
   startEdit(p: any){
     this.editingId = p.id;
@@ -123,30 +130,47 @@ export class AdminProspects implements OnInit {
     this.prospectService.update(id, this.editForm).subscribe({
       next: () => {
         this.editingId = null;
-        this.successMessage = "Prospect mis à jour.";
+        this.successMessage = "Prospect mis à jour avec succès.";
         this.loadProspects();
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: () => {
         this.errorMessage = "Erreur lors de la mise à jour.";
+        setTimeout(() => this.errorMessage = '', 4000);
       }
     });
   }
 
-  // ---------- DELETE ----------
+  askDelete(p: any){
+    this.deleteTarget = p;
+  }
 
-  deleteProspect(id: number){
-    if (!confirm('Supprimer définitivement ce prospect ?')) return;
+  cancelDelete(){
+    this.deleteTarget = null;
+  }
 
-    this.prospectService.delete(id).subscribe({
+  confirmDelete(){
+    if (!this.deleteTarget) return;
+
+    const name = this.deleteTarget.userName;
+
+    this.prospectService.delete(this.deleteTarget.id).subscribe({
       next: () => {
-        this.successMessage = "Prospect supprimé.";
+        this.successMessage = `Prospect ${name} supprimé avec succès.`;
+        this.deleteTarget = null;
         this.loadProspects();
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: () => {
         this.errorMessage = "Erreur lors de la suppression.";
+        this.deleteTarget = null;
+        setTimeout(() => this.errorMessage = '', 4000);
       }
     });
+  }
+
+  logout(){
+    this.auth.logout();
+    this.router.navigate(['/login']);
   }
 }

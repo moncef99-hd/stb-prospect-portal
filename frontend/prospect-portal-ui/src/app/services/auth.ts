@@ -26,7 +26,9 @@ export class Auth {
 
   }
 
-
+getUserById(id: number){
+  return this.http.get(`${this.api}/users/${id}`);
+}
 
   login(data:any){
 

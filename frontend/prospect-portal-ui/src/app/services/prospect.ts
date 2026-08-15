@@ -11,8 +11,8 @@ export class Prospect {
   constructor(private http: HttpClient) {}
 
   getAll() {
-    return this.http.get(this.api);
-  }
+  return this.http.get<any[]>(this.api);
+}
 
   getByUserId(userId: number) {
     return this.http.get(`${this.api}/by-user/${userId}`);

@@ -63,9 +63,22 @@ export class Login {
 
     this.auth.login(payload).subscribe({
       next: (response: any) => {
-        this.loading = false;
         this.auth.saveToken(response.token);
-        this.router.navigate(['/dashboard']);
+
+        this.auth.me().subscribe({
+          next: (userData: any) => {
+            this.loading = false;
+            if (userData.role === 'Admin') {
+              this.router.navigate(['/admin/prospects']);
+            } else {
+              this.router.navigate(['/dashboard']);
+            }
+          },
+          error: () => {
+            this.loading = false;
+            this.router.navigate(['/dashboard']);
+          }
+        });
       },
       error: (err) => {
         this.loading = false;

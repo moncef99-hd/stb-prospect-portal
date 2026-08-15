@@ -5,7 +5,9 @@
       <div class="hp-dash-logo">STB</div>
       Portail Prospect
     </div>
-
+<a routerLink="/admin/prospects" class="hp-logout-btn" *ngIf="isAdmin" style="margin-right:8px; text-decoration:none;">
+  ⚙️ Administration
+</a>
     <div class="hp-dash-user" *ngIf="!loading">
       <div class="hp-avatar">{{ initials }}</div>
       <button class="hp-logout-btn" (click)="logout()">Déconnexion</button>
@@ -129,21 +131,68 @@
       </div>
 
       <!-- Infos personnelles -->
-      <div class="hp-section-title">Informations personnelles</div>
-      <div class="hp-info-card">
-        <div class="hp-info-row">
-          <span class="hp-info-label">Nom complet</span>
-          <span class="hp-info-value">{{ user.firstName }} {{ user.lastName }}</span>
-        </div>
-        <div class="hp-info-row">
-          <span class="hp-info-label">Adresse email</span>
-          <span class="hp-info-value">{{ user.email }}</span>
-        </div>
-        <div class="hp-info-row">
-          <span class="hp-info-label">Membre depuis</span>
-          <span class="hp-info-value">{{ memberSince }}</span>
-        </div>
+      <div class="hp-admin-header-row">
+  <div class="hp-section-title" style="margin:0;">Informations personnelles</div>
+  <button class="hp-btn-sm hp-btn-edit" *ngIf="!editingProfile" (click)="startEditProfile()">
+    ✏️ Modifier mes coordonnées
+  </button>
+</div>
+
+<div class="hp-success-msg" *ngIf="profileSuccess">
+  ✓ {{ profileSuccess }}
+</div>
+
+<div class="hp-info-card">
+
+  <div class="hp-info-row">
+    <span class="hp-info-label">Nom complet</span>
+    <span class="hp-info-value">{{ user.firstName }} {{ user.lastName }}</span>
+  </div>
+  <div class="hp-info-row">
+    <span class="hp-info-label">Adresse email</span>
+    <span class="hp-info-value">{{ user.email }}</span>
+  </div>
+  <div class="hp-info-row">
+    <span class="hp-info-label">Membre depuis</span>
+    <span class="hp-info-value">{{ memberSince }}</span>
+  </div>
+
+  <ng-container *ngIf="!editingProfile">
+    <div class="hp-info-row">
+      <span class="hp-info-label">Téléphone</span>
+      <span class="hp-info-value">{{ prospect?.phoneNumber || 'Non renseigné' }}</span>
+    </div>
+    <div class="hp-info-row">
+      <span class="hp-info-label">Adresse</span>
+      <span class="hp-info-value">{{ prospect?.address || 'Non renseignée' }}</span>
+    </div>
+  </ng-container>
+
+  <div class="hp-profile-edit-block" *ngIf="editingProfile">
+
+    <div class="hp-error-msg" *ngIf="profileError">
+      ⚠️ {{ profileError }}
+    </div>
+
+    <div class="hp-field-row" style="margin-top:16px;">
+      <div class="hp-field">
+        <label>Téléphone</label>
+        <input [(ngModel)]="profileForm.phoneNumber" placeholder="12345678">
       </div>
+      <div class="hp-field">
+        <label>Adresse</label>
+        <input [(ngModel)]="profileForm.address" placeholder="Ville, rue...">
+      </div>
+    </div>
+
+    <div class="hp-modal-actions" style="justify-content:flex-start; margin-top:8px;">
+      <button class="hp-btn-sm hp-btn-save" (click)="saveProfile()">Enregistrer</button>
+      <button class="hp-btn-sm hp-btn-cancel" (click)="cancelEditProfile()">Annuler</button>
+    </div>
+
+  </div>
+
+</div>
 
       <!-- Services -->
       <div class="hp-section-title">Services bancaires</div>
@@ -155,7 +204,9 @@
           <div class="hp-service-arrow">→</div>
         </div>
       </div>
-
+<div class="hp-incomplete-banner" *ngIf="!hasCompleteProfile && !isClient">
+  📋 Complétez votre profil (téléphone, adresse) pour accélérer le traitement de votre future demande.
+</div>
       <!-- CTA devenir client -->
       <div class="hp-cta-card hp-cta-card-big" *ngIf="!isClient">
         <div class="hp-cta-content">

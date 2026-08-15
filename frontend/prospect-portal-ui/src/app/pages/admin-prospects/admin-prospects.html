@@ -5,15 +5,47 @@
       <div class="hp-dash-logo">STB</div>
       Administration — Prospects
     </div>
+
+    <div class="hp-dash-user">
+      <a routerLink="/dashboard" class="hp-logout-btn" style="text-decoration:none; margin-right:8px;">
+        ← Mon espace
+      </a>
+      <button class="hp-logout-btn" (click)="logout()">Déconnexion</button>
+    </div>
   </div>
 
   <div class="hp-dash-body">
 
+    <div class="hp-welcome-banner" style="margin-bottom: 28px;">
+      <div class="hp-orb hp-orb-1"></div>
+      <h1>Gestion des prospects</h1>
+      <p>Consultez, modifiez et gérez l'ensemble des dossiers prospects STB.</p>
+    </div>
+
+    <div class="hp-stats-grid">
+      <div class="hp-stat-card">
+        <div class="hp-stat-icon">📋</div>
+        <div class="hp-stat-value">{{ countByStatus.prospect }}</div>
+        <div class="hp-stat-label">Prospects</div>
+      </div>
+      <div class="hp-stat-card">
+        <div class="hp-stat-icon">⏳</div>
+        <div class="hp-stat-value">{{ countByStatus.pending }}</div>
+        <div class="hp-stat-label">Demandes en attente</div>
+      </div>
+      <div class="hp-stat-card">
+        <div class="hp-stat-icon">✅</div>
+        <div class="hp-stat-value">{{ countByStatus.client }}</div>
+        <div class="hp-stat-label">Clients</div>
+      </div>
+    </div>
+
     <div class="hp-admin-header-row">
       <div class="hp-section-title" style="margin:0;">Liste des prospects</div>
-      <button class="hp-btn-primary hp-btn-inline" (click)="toggleCreateForm()">
-        {{ showCreateForm ? '✕ Fermer' : '+ Ajouter un prospect' }}
-      </button>
+      <input
+        class="hp-admin-search"
+        [(ngModel)]="searchTerm"
+        placeholder="🔍 Rechercher un prospect...">
     </div>
 
     <div class="hp-success-msg" *ngIf="successMessage">
@@ -24,55 +56,31 @@
       ⚠️ {{ errorMessage }}
     </div>
 
-    <!-- Formulaire de création -->
-    <div class="hp-create-card" *ngIf="showCreateForm">
-      <h3>Nouveau prospect</h3>
-
-      <div class="hp-error-msg" *ngIf="createError">
-        ⚠️ {{ createError }}
-      </div>
-
-      <div class="hp-create-grid">
-        <div class="hp-field">
-          <label>User ID (lié à AuthService)</label>
-          <input type="number" [(ngModel)]="createForm.userId" placeholder="ex: 3">
-        </div>
-        <div class="hp-field">
-          <label>Téléphone</label>
-          <input [(ngModel)]="createForm.phoneNumber" placeholder="12345678">
-        </div>
-        <div class="hp-field">
-          <label>Adresse</label>
-          <input [(ngModel)]="createForm.address" placeholder="Tunis">
-        </div>
-      </div>
-
-      <button class="hp-btn-primary hp-btn-inline" (click)="submitCreate()" [disabled]="creating">
-        {{ creating ? 'Création...' : 'Créer le prospect' }}
-      </button>
-    </div>
-
     <div *ngIf="loading" class="hp-skeleton" style="width:100%; height:300px; border-radius:16px;"></div>
 
     <div class="hp-admin-table-card" *ngIf="!loading">
 
       <div class="hp-admin-table-header">
-        <span>ID</span>
-        <span>User ID</span>
+        <span>Prospect</span>
         <span>Téléphone</span>
         <span>Adresse</span>
         <span>Statut</span>
-        <span>Créé le</span>
+        <span>Inscrit le</span>
         <span>Actions</span>
       </div>
 
-      <div class="hp-admin-table-row" *ngFor="let p of prospects">
+      <div class="hp-admin-table-row" *ngFor="let p of filteredProspects">
 
         <ng-container *ngIf="editingId !== p.id">
-          <span>#{{ p.id }}</span>
-          <span>{{ p.userId }}</span>
-          <span>{{ p.phoneNumber || '—' }}</span>
-          <span>{{ p.address || '—' }}</span>
+          <span class="hp-admin-user-cell">
+            <span class="hp-admin-avatar">{{ initials(p.userName) }}</span>
+            <span>
+              <span class="hp-admin-user-name">{{ p.userName }}</span>
+              <span class="hp-admin-user-email">{{ p.userEmail }}</span>
+            </span>
+          </span>
+          <span>{{ p.phoneNumber || 'Non renseigné' }}</span>
+          <span>{{ p.address || 'Non renseignée' }}</span>
           <span>
             <span class="hp-status-badge-sm" [ngClass]="statusClass(p.status)">
               {{ statusLabel(p.status) }}
@@ -81,15 +89,17 @@
           <span>{{ p.createdAt | date:'dd/MM/yyyy' }}</span>
           <span class="hp-admin-actions">
             <button class="hp-btn-sm hp-btn-edit" (click)="startEdit(p)">Modifier</button>
-            <button class="hp-btn-sm hp-btn-delete" (click)="deleteProspect(p.id)">Supprimer</button>
+            <button class="hp-btn-sm hp-btn-delete" (click)="askDelete(p)">Supprimer</button>
           </span>
         </ng-container>
 
         <ng-container *ngIf="editingId === p.id">
-          <span>#{{ p.id }}</span>
-          <span>{{ p.userId }}</span>
-          <span><input [(ngModel)]="editForm.phoneNumber" class="hp-admin-input"></span>
-          <span><input [(ngModel)]="editForm.address" class="hp-admin-input"></span>
+          <span class="hp-admin-user-cell">
+            <span class="hp-admin-avatar">{{ initials(p.userName) }}</span>
+            <span class="hp-admin-user-name">{{ p.userName }}</span>
+          </span>
+          <span><input [(ngModel)]="editForm.phoneNumber" class="hp-admin-input" placeholder="Téléphone"></span>
+          <span><input [(ngModel)]="editForm.address" class="hp-admin-input" placeholder="Adresse"></span>
           <span>
             <select [(ngModel)]="editForm.status" class="hp-admin-input">
               <option [value]="0">Prospect</option>
@@ -106,12 +116,26 @@
 
       </div>
 
-      <div class="hp-admin-empty" *ngIf="prospects.length === 0">
-        Aucun prospect enregistré pour le moment.
+      <div class="hp-admin-empty" *ngIf="filteredProspects.length === 0">
+        Aucun prospect ne correspond à votre recherche.
       </div>
 
     </div>
 
   </div>
-
+<!-- Modale de confirmation suppression -->
+<div class="hp-modal-overlay" *ngIf="deleteTarget">
+  <div class="hp-modal-box">
+    <div class="hp-modal-icon">⚠️</div>
+    <h3>Supprimer ce prospect ?</h3>
+    <p>
+      Vous êtes sur le point de supprimer définitivement le dossier de
+      <strong>{{ deleteTarget.userName }}</strong>. Cette action est irréversible.
+    </p>
+    <div class="hp-modal-actions">
+      <button class="hp-btn-sm hp-btn-cancel" (click)="cancelDelete()">Annuler</button>
+      <button class="hp-btn-sm hp-btn-confirm-delete" (click)="confirmDelete()">Supprimer définitivement</button>
+    </div>
+  </div>
+</div>
 </div>
