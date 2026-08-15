@@ -37,12 +37,32 @@ public class AuthControllerTests
         return new JwtService(configuration);
     }
 
+    // Cree un RabbitMqPublisher avec une configuration de test.
+    // La connexion est etablie de maniere paresseuse (lazy), donc aucune
+    // connexion RabbitMQ reelle n'est necessaire pour ces tests.
+    // Si la publication echoue (pas de RabbitMQ disponible en CI), le
+    // controleur l'attrape via son try/catch et continue normalement.
+    private RabbitMqPublisher CreateRabbitMqPublisher()
+    {
+        var inMemorySettings = new Dictionary<string, string?>
+        {
+            { "RabbitMQ:HostName", "localhost" },
+            { "RabbitMQ:UserName", "guest" },
+            { "RabbitMQ:Password", "guest" }
+        };
+
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings)
+            .Build();
+
+        return new RabbitMqPublisher(configuration);
+    }
+
     [Fact]
     public async Task Register_WithValidData_ReturnsOkAndCreatesUser()
     {
-        // Arrange
         var context = CreateContext();
-        var controller = new AuthController(context, CreateJwtService());
+        var controller = new AuthController(context, CreateJwtService(), CreateRabbitMqPublisher());
         var dto = new RegisterDto
         {
             FirstName = "Test",
@@ -51,24 +71,21 @@ public class AuthControllerTests
             Password = "Test@1234"
         };
 
-        // Act
         var result = await controller.Register(dto);
 
-        // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(200, okResult.StatusCode);
 
         var userInDb = await context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
         Assert.NotNull(userInDb);
-        Assert.NotEqual(dto.Password, userInDb!.PasswordHash); // le mot de passe doit etre hashe, pas stocke en clair
+        Assert.NotEqual(dto.Password, userInDb!.PasswordHash);
     }
 
     [Fact]
     public async Task Register_WithExistingEmail_ReturnsBadRequest()
     {
-        // Arrange
         var context = CreateContext();
-        var controller = new AuthController(context, CreateJwtService());
+        var controller = new AuthController(context, CreateJwtService(), CreateRabbitMqPublisher());
         var dto = new RegisterDto
         {
             FirstName = "Test",
@@ -77,12 +94,10 @@ public class AuthControllerTests
             Password = "Test@1234"
         };
 
-        await controller.Register(dto); // premiere inscription : doit reussir
+        await controller.Register(dto);
 
-        // Act
-        var result = await controller.Register(dto); // deuxieme inscription : meme email
+        var result = await controller.Register(dto);
 
-        // Assert
         var badRequest = Assert.IsType<BadRequestObjectResult>(result);
         Assert.Equal(400, badRequest.StatusCode);
     }
@@ -90,9 +105,8 @@ public class AuthControllerTests
     [Fact]
     public async Task Login_WithValidCredentials_ReturnsOkWithToken()
     {
-        // Arrange
         var context = CreateContext();
-        var controller = new AuthController(context, CreateJwtService());
+        var controller = new AuthController(context, CreateJwtService(), CreateRabbitMqPublisher());
         var registerDto = new RegisterDto
         {
             FirstName = "Test",
@@ -108,21 +122,18 @@ public class AuthControllerTests
             Password = "Test@1234"
         };
 
-        // Act
         var result = await controller.Login(loginDto);
 
-        // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(200, okResult.StatusCode);
-        Assert.NotNull(okResult.Value); // doit contenir un token
+        Assert.NotNull(okResult.Value);
     }
 
     [Fact]
     public async Task Login_WithWrongPassword_ReturnsUnauthorized()
     {
-        // Arrange
         var context = CreateContext();
-        var controller = new AuthController(context, CreateJwtService());
+        var controller = new AuthController(context, CreateJwtService(), CreateRabbitMqPublisher());
         var registerDto = new RegisterDto
         {
             FirstName = "Test",
@@ -138,29 +149,24 @@ public class AuthControllerTests
             Password = "WrongPassword123"
         };
 
-        // Act
         var result = await controller.Login(loginDto);
 
-        // Assert
         Assert.IsType<UnauthorizedObjectResult>(result);
     }
 
     [Fact]
     public async Task Login_WithNonExistentEmail_ReturnsUnauthorized()
     {
-        // Arrange
         var context = CreateContext();
-        var controller = new AuthController(context, CreateJwtService());
+        var controller = new AuthController(context, CreateJwtService(), CreateRabbitMqPublisher());
         var loginDto = new LoginDto
         {
             Email = "doesnotexist@example.com",
             Password = "Whatever123"
         };
 
-        // Act
         var result = await controller.Login(loginDto);
 
-        // Assert
         Assert.IsType<UnauthorizedObjectResult>(result);
     }
 }
