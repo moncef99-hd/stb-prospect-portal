@@ -13,6 +13,20 @@ services:
     networks:
       - stb-network
 
+  postgres-prospect:
+    image: postgres:16
+    container_name: stb-postgres-prospect
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+      - POSTGRES_DB=stb_prospect
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_prospect_data:/var/lib/postgresql/data
+    networks:
+      - stb-network
+
   authservice:
     build: ./backend/AuthService
     container_name: stb-authservice
@@ -25,6 +39,18 @@ services:
     networks:
       - stb-network
 
+  prospectservice:
+    build: ./backend/ProspectService
+    container_name: stb-prospectservice
+    ports:
+      - "8081:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres-prospect;Port=5432;Database=stb_prospect;Username=postgres;Password=postgres123
+    depends_on:
+      - postgres-prospect
+    networks:
+      - stb-network
+
   frontend:
     build: ./frontend/prospect-portal-ui
     container_name: stb-frontend
@@ -32,11 +58,13 @@ services:
       - "4200:80"
     depends_on:
       - authservice
+      - prospectservice
     networks:
       - stb-network
 
 volumes:
   postgres_data:
+  postgres_prospect_data:
 
 networks:
   stb-network:
