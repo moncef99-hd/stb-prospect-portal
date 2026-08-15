@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProspectService.Data;
+using ProspectService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHostedService<RabbitMqConsumer>();
 
 builder.Services.AddCors(options =>
 {
