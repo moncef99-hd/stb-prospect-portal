@@ -7,30 +7,25 @@ on:
     branches: [ develop, main ]
 
 jobs:
-  backend:
-    name: Build AuthService (.NET)
+  backend-prospect:
+    name: Build ProspectService (.NET)
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend/AuthService
-
+        working-directory: backend/ProspectService
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-
       - name: Restore dependencies
         run: dotnet restore
-
       - name: Build
         run: dotnet build --no-restore --configuration Release
-
       - name: Run tests
-        run: dotnet test ../AuthService.Tests --configuration Release --logger "console;verbosity=normal"
+        run: dotnet test ../ProspectService.Tests --configuration Release --logger "console;verbosity=normal"
 
   frontend:
     name: Build Angular
