@@ -83,6 +83,17 @@ services:
     networks:
       - stb-network
 
+  apigateway:
+    build: ./backend/ApiGateway
+    container_name: stb-apigateway
+    ports:
+      - "8000:8080"
+    depends_on:
+      - authservice
+      - prospectservice
+    networks:
+      - stb-network
+
   frontend:
     build: ./frontend/prospect-portal-ui
     container_name: stb-frontend
