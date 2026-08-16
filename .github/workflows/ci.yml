@@ -1,12 +1,29 @@
 name: CI - Build and Test
-
 on:
   push:
     branches: [ develop, main ]
   pull_request:
     branches: [ develop, main ]
-
 jobs:
+  backend:
+    name: Build AuthService (.NET)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/AuthService
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+      - name: Run tests
+        run: dotnet test ../AuthService.Tests --configuration Release --logger "console;verbosity=normal"
   backend-prospect:
     name: Build ProspectService (.NET)
     runs-on: ubuntu-latest
@@ -26,67 +43,61 @@ jobs:
         run: dotnet build --no-restore --configuration Release
       - name: Run tests
         run: dotnet test ../ProspectService.Tests --configuration Release --logger "console;verbosity=normal"
-
   frontend:
     name: Build Angular
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend/prospect-portal-ui
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install dependencies
         run: npm ci
-
       - name: Build
         run: npm run build
-
   docker-build:
     name: Build Docker images
     runs-on: ubuntu-latest
-    needs: [backend, frontend]
-
+    needs: [backend, backend-prospect, frontend]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Build AuthService image
         run: docker build -t stb-authservice ./backend/AuthService
-
+      - name: Build ProspectService image
+        run: docker build -t stb-prospectservice ./backend/ProspectService
       - name: Build Frontend image
         run: docker build -t stb-frontend ./frontend/prospect-portal-ui
-
   deploy:
     name: Push Docker images to Docker Hub
     runs-on: ubuntu-latest
-    needs: [backend, frontend]
+    needs: [backend, backend-prospect, frontend]
     if: github.event_name == 'push'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Build and push AuthService image
         uses: docker/build-push-action@v5
         with:
           context: ./backend/AuthService
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/stb-authservice:latest
-
+      - name: Build and push ProspectService image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/ProspectService
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/stb-prospectservice:latest
       - name: Build and push Frontend image
         uses: docker/build-push-action@v5
         with:
