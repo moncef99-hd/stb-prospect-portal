@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class Prospect {
 
-  private api = "http://localhost:8081/api/prospects";
+  private api = "http://localhost:8000/api/prospects";
 
   constructor(private http: HttpClient) {}
 
