@@ -94,6 +94,33 @@ services:
     networks:
       - stb-network
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: stb-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - authservice
+      - prospectservice
+      - apigateway
+    networks:
+      - stb-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: stb-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - stb-network
+
   frontend:
     build: ./frontend/prospect-portal-ui
     container_name: stb-frontend

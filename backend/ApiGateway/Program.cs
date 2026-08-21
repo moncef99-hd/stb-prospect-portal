@@ -1,3 +1,5 @@
+using Prometheus;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddReverseProxy()
@@ -18,6 +20,9 @@ var app = builder.Build();
 
 app.UseCors("angular");
 
+app.UseHttpMetrics();
+
 app.MapReverseProxy();
+app.MapMetrics();
 
 app.Run();
