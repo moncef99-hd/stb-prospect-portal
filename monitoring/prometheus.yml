@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'authservice'
+    static_configs:
+      - targets: ['authservice:8080']
+
+  - job_name: 'prospectservice'
+    static_configs:
+      - targets: ['prospectservice:8080']
+
+  - job_name: 'apigateway'
+    static_configs:
+      - targets: ['apigateway:8080']

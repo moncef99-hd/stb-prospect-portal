@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProspectService.Data;
 using ProspectService.Services;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +35,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("angular");
 app.UseHttpsRedirection();
+
+app.UseHttpMetrics();
+
 app.UseAuthorization();
 app.MapControllers();
+app.MapMetrics();
 
 app.Run();

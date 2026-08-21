@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Cors;
+using Prometheus;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Connexion PostgreSQL
@@ -61,9 +63,13 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors("angular");
 app.UseHttpsRedirection();
+
+app.UseHttpMetrics();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapMetrics();
 
 app.Run();
