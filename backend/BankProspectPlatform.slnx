@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="AuthService.Tests/AuthService.Tests.csproj" />
   <Project Path="AuthService/AuthService.csproj" />
+  <Project Path="NotificationService/NotificationService.csproj" />
   <Project Path="ProspectService/ProspectService.csproj" />
 </Solution>

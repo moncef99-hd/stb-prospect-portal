@@ -83,6 +83,19 @@ services:
     networks:
       - stb-network
 
+  notificationservice:
+    build: ./backend/NotificationService
+    container_name: stb-notificationservice
+    environment:
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=guest
+      - RabbitMQ__Password=guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - stb-network
+
   apigateway:
     build: ./backend/ApiGateway
     container_name: stb-apigateway
