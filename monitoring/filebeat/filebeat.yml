@@ -1,0 +1,16 @@
+filebeat.inputs:
+  - type: container
+    paths:
+      - /var/lib/docker/containers/*/*.log
+
+processors:
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  index: "stb-logs-%{+yyyy.MM.dd}"
+
+setup.template.name: "stb-logs"
+setup.template.pattern: "stb-logs-*"
+setup.ilm.enabled: false

@@ -160,7 +160,19 @@ services:
     depends_on:
       - elasticsearch
     networks:
-      - stb-network    
+      - stb-network  
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.15.0
+    container_name: stb-filebeat
+    user: root
+    volumes:
+      - ./monitoring/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      - stb-network  
 
   frontend:
     build: ./frontend/prospect-portal-ui
