@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { Prospect } from '../../services/prospect';
 import { Auth } from '../../services/auth';
-
+import { NotificationBell } from '../../components/notification-bell/notification-bell';
 @Component({
   selector: 'app-admin-prospects',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, NotificationBell],
   templateUrl: './admin-prospects.html',
   styleUrl: './admin-prospects.css'
 })
