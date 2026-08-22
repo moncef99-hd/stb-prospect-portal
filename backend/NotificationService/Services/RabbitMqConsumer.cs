@@ -2,6 +2,8 @@ using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using NotificationService.Data;
+using NotificationService.Models;
 
 namespace NotificationService.Services;
 
@@ -12,13 +14,18 @@ public class RabbitMqConsumer : BackgroundService
 
     private readonly IConfiguration _configuration;
     private readonly ILogger<RabbitMqConsumer> _logger;
+    private readonly IServiceProvider _serviceProvider;
     private IConnection? _connection;
     private IChannel? _channel;
 
-    public RabbitMqConsumer(IConfiguration configuration, ILogger<RabbitMqConsumer> logger)
+    public RabbitMqConsumer(
+        IConfiguration configuration,
+        ILogger<RabbitMqConsumer> logger,
+        IServiceProvider serviceProvider)
     {
         _configuration = configuration;
         _logger = logger;
+        _serviceProvider = serviceProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -72,7 +79,7 @@ public class RabbitMqConsumer : BackgroundService
 
                         if (data != null)
                         {
-                            SendWelcomeNotification(data);
+                            await SaveNotificationAsync(data);
                         }
                     }
                     catch (Exception ex)
@@ -105,10 +112,26 @@ public class RabbitMqConsumer : BackgroundService
         }
     }
 
-    private void SendWelcomeNotification(UserRegisteredEvent data)
+    private async Task SaveNotificationAsync(UserRegisteredEvent data)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var notification = new Notification
+        {
+            UserId = data.UserId,
+            ProspectName = $"{data.FirstName} {data.LastName}",
+            Email = data.Email,
+            Message = $"Nouveau prospect inscrit : {data.FirstName} {data.LastName}",
+            IsRead = false,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        db.Notifications.Add(notification);
+        await db.SaveChangesAsync();
+
         _logger.LogInformation(
-            "Email de bienvenue envoye a {Email} (Bonjour {FirstName} {LastName} !)",
+            "Notification enregistree pour {Email} (Bonjour {FirstName} {LastName} !)",
             data.Email, data.FirstName, data.LastName);
     }
 
