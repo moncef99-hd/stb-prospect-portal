@@ -77,6 +77,24 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore --configuration Release
+      - name: Run tests
+        run: dotnet test ../NotificationService.Tests --configuration Release --logger "console;verbosity=normal"
+    name: Build NotificationService (.NET)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/NotificationService
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
   frontend:
     name: Build Angular
     runs-on: ubuntu-latest
