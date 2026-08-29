@@ -148,6 +148,9 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       - prometheus
     networks:
@@ -169,6 +172,7 @@ volumes:
   postgres_prospect_data:
   postgres_notification_data:
   rabbitmq_data:
+  grafana_data:
 
 networks:
   stb-network:
